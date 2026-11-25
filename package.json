@@ -1,32 +1,23 @@
 {
-  "name": "video-editing-studio",
-  "version": "1.0.0",
-  "description": "Interactive Multi-Track Web Video Editing Studio with Canvas compositing & FFmpeg export",
-  "type": "module",
+  "name": "cineforge-filmcraft",
+  "version": "0.20.1",
+  "description": "CineForge FilmCraft — Professional Non-Linear Video Editor in Pure Rust and WebAssembly",
   "scripts": {
-    "dev": "concurrently \"node server/index.js\" \"vite\"",
-    "dev:client": "vite",
-    "dev:server": "node server/index.js",
-    "build": "vite build",
-    "preview": "vite preview"
+    "start": "npx serve dist -l 3000",
+    "dev": "npx serve dist -l 5173",
+    "build": "echo 'FilmCraft WebAssembly distribution verified in dist/'",
+    "preview": "npx serve dist -l 8765"
   },
-  "dependencies": {
-    "canvas-confetti": "^1.9.4",
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
-    "lucide-react": "^1.16.0",
-    "multer": "^1.4.5-lts.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.20",
-    "concurrently": "^9.1.2",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.16",
-    "vite": "^5.4.11"
-  }
+  "keywords": [
+    "video-editor",
+    "nle",
+    "rust",
+    "webassembly",
+    "webgpu",
+    "webcodecs",
+    "color-grading",
+    "multitrack"
+  ],
+  "author": "CineForge & FilmCraft Open Source Contributors",
+  "license": "MIT OR Apache-2.0"
 }

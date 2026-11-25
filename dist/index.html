@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>CineForge FilmCraft | Professional Non-Linear Video Editor</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #0b0d13;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      color: #e2e8f0;
+      user-select: none;
+    }
+
+    canvas#filmcraft_canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 1;
+    }
+
+    /* Top Studio Bar */
+    #top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: rgba(15, 18, 28, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 50;
+      font-size: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    #top-bar.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .brand-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #6366f1, #9333ea);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #181c2b;
+      border: 1px solid #283148;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #94a3b8;
+    }
+    .user-pill strong { color: #38bdf8; }
+    .btn-action {
+      background: #1e2438;
+      border: 1px solid #2f3a54;
+      color: #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-action:hover {
+      background: #2b3450;
+      color: #fff;
+    }
+    .btn-logout {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+    }
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.3);
+      color: #fff;
+    }
+
+    /* Loading Screen */
+    #loading {
+      position: absolute;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      background: #0b0d13;
+      color: #c9c9cc;
+      font-size: 13px;
+      z-index: 10;
+    }
+    #loading.active { display: flex; }
+    #loading .spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(99, 102, 241, 0.2);
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Login Modal Overlay */
+    #login-overlay {
+      position: absolute;
+      inset: 0;
+      background: #07090e;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+    #login-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .login-card {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      background: rgba(17, 20, 31, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid #23293c;
+      border-radius: 20px;
+      padding: 32px 36px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.9);
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .login-logo {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 14px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #6366f1, #9333ea);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+    }
+    .login-logo svg { width: 28px; height: 28px; fill: none; stroke: #fff; stroke-width: 2; }
+    .login-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+      margin: 0 0 6px;
+      letter-spacing: -0.5px;
+    }
+    .login-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      margin: 0;
+    }
+    .demo-pill {
+      background: #171b28;
+      border: 1px solid #262f44;
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+    .demo-text {
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .demo-text strong { color: #818cf8; }
+    .btn-fill {
+      background: rgba(99, 102, 241, 0.2);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #a5b4fc;
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-fill:hover {
+      background: #6366f1;
+      color: #fff;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap input {
+      width: 100%;
+      background: #181c2a;
+      border: 1px solid #293246;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      color: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-wrap input:focus {
+      border-color: #6366f1;
+    }
+    .btn-submit {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border: 0;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+      transition: all 0.2s;
+    }
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      transform: translateY(-1px);
+    }
+    .login-error {
+      display: none;
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #fca5a5;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 14px;
+    }
+    .login-error.on { display: block; }
+
+    /* Fatal error modal */
+    #fatal {
+      position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+      background: rgba(11, 13, 19, 0.95); color: #e2e8f0; font: 14px/1.5 system-ui, sans-serif; z-index: 200;
+    }
+    #fatal.on { display: flex; }
+    #fatal .box { max-width: min(78ch, calc(100vw - 32px)); padding: 24px; background: #1a1f2e; border: 1px solid #2b354c; border-radius: 12px; }
+    #fatal h1 { margin: 0 0 10px; font-size: 18px; color: #f87171; }
+    #fatal pre { max-height: 40vh; overflow: auto; white-space: pre-wrap; font-size: 12px; color: #94a3b8; background: #0f121a; padding: 12px; border-radius: 8px; }
+    #fatal button { font: inherit; padding: 8px 18px; border: 0; border-radius: 8px; background: #6366f1; color: #fff; font-weight: 600; cursor: pointer; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <!-- Top Floating Controls -->
+  <div id="top-bar">
+    <div class="brand-pill">
+      <span>★ CineForge FilmCraft</span>
+      <span style="color: #64748b; font-weight: 400; text-transform: none;">• Pro Video NLE</span>
+    </div>
+    <div class="top-actions">
+      <div class="user-pill">
+        <span>Logged in as:</span>
+        <strong id="bar-username">admin</strong>
+      </div>
+      <button class="btn-action" onclick="toggleFullscreen()" title="Fullscreen mode">⛶ Fullscreen</button>
+      <button class="btn-action btn-logout" onclick="logout()" title="Sign Out">Sign Out</button>
+    </div>
+  </div>
+
+  <!-- FilmCraft Canvas -->
+  <canvas id="filmcraft_canvas"></canvas>
+
+  <!-- Loading State -->
+  <div id="loading">
+    <div class="spinner"></div>
+    <div id="status">Starting FilmCraft Engine & WebGPU/WebGL…</div>
+  </div>
+
+  <!-- Fatal Alert Dialog -->
+  <div id="fatal" role="alertdialog" aria-labelledby="fatal-title">
+    <div class="box">
+      <h1 id="fatal-title">FilmCraft Session Stopped</h1>
+      <div>Unsaved changes are kept automatically in browser storage (OPFS) and restore on reload.</div>
+      <pre id="fatal-msg"></pre>
+      <button id="fatal-reload" type="button">Reload FilmCraft</button>
+    </div>
+  </div>
+
+  <!-- Login Gate Modal -->
+  <div id="login-overlay">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <svg viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+        </div>
+        <h1 class="login-title">CineForge FilmCraft</h1>
+        <p class="login-sub">Professional Non-Linear Video Editor in Pure Rust</p>
+      </div>
+
+      <div class="demo-pill">
+        <div class="demo-text">
+          User: <strong>admin</strong> • Pass: <strong>studio2026</strong>
+        </div>
+        <button type="button" class="btn-fill" onclick="fillDemo()">Fill Demo</button>
+      </div>
+
+      <div id="login-error-msg" class="login-error"></div>
+
+      <form id="login-form" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Username / Email</label>
+          <div class="input-wrap">
+            <input type="text" id="login-user" required placeholder="admin" autofocus>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <input type="password" id="login-pass" required placeholder="••••••••">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">Enter Video Studio →</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const STATIC_USER = 'admin';
+    const STATIC_PASS = 'studio2026';
+
+    function fillDemo() {
+      document.getElementById('login-user').value = STATIC_USER;
+      document.getElementById('login-pass').value = STATIC_PASS;
+      document.getElementById('login-error-msg').classList.remove('on');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const user = document.getElementById('login-user').value.trim().toLowerCase();
+      const pass = document.getElementById('login-pass').value.trim();
+      const errBox = document.getElementById('login-error-msg');
+
+      if ((user === STATIC_USER || user === 'creator@cineforge.io') && pass === STATIC_PASS) {
+        localStorage.setItem('cineforge_auth', JSON.stringify({ user: user, time: Date.now() }));
+        unlockStudio(user);
+      } else {
+        errBox.textContent = 'Invalid credentials. Click "Fill Demo" to use admin / studio2026.';
+        errBox.classList.add('on');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('cineforge_auth');
+      sessionStorage.removeItem('cineforge_auth');
+      location.reload();
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    function unlockStudio(username) {
+      document.getElementById('login-overlay').classList.add('hidden');
+      document.getElementById('bar-username').textContent = username || 'admin';
+      document.getElementById('top-bar').classList.add('active');
+      startFilmCraft();
+    }
+
+    // Auto-login check
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = localStorage.getItem('cineforge_auth') || sessionStorage.getItem('cineforge_auth');
+      if (saved) {
+        try {
+          const auth = JSON.parse(saved);
+          unlockStudio(auth.user);
+          return;
+        } catch(e) {}
+      }
+    });
+
+    window.filmcraftLoad = {};
+    let lastPanic = null;
+    const consoleError = console.error.bind(console);
+    console.error = (...a) => {
+      const m = a.map(String).join(" ");
+      if (/panicked at|memory allocation of/.test(m)) lastPanic = m;
+      consoleError(...a);
+    };
+    window.filmcraftFatal = (what) => {
+      if (window.filmcraftLoad.fatal) return;
+      const msg = lastPanic || String(what && (what.stack || what.message) || what);
+      window.filmcraftLoad.fatal = msg;
+      const el = document.getElementById("fatal");
+      document.getElementById("fatal-msg").textContent = msg.split("\n\nStack:")[0];
+      el.classList.add("on");
+    };
+    document.getElementById("fatal-reload").onclick = () => location.reload();
+    const isFatal = (e) => e instanceof WebAssembly.RuntimeError || /panicked at|unreachable|memory access out of bounds/.test(String(e && e.message || e));
+    addEventListener("error", (ev) => { if (window.filmcraftLoad.readyMs && isFatal(ev.error || ev.message)) window.filmcraftFatal(ev.error || ev.message); });
+    addEventListener("unhandledrejection", (ev) => { if (window.filmcraftLoad.readyMs && isFatal(ev.reason)) window.filmcraftFatal(ev.reason); });
+
+    let started = false;
+    async function startFilmCraft() {
+      if (started) return;
+      started = true;
+      document.getElementById('loading').classList.add('active');
+
+      const build = "c1bd4e1574265f32";
+      const v = build.startsWith("__") ? "" : "?v=" + build;
+      const t0 = performance.now();
+      const params = new URLSearchParams(location.search);
+
+      try {
+        const { default: init, start } = await import("./filmcraft_web.js" + v);
+        await init({ module_or_path: new URL("filmcraft_web_bg.wasm" + v, location.href) });
+        window.filmcraftLoad.wasmMs = performance.now() - t0;
+        await start("filmcraft_canvas");
+        window.filmcraftLoad.readyMs = performance.now() - t0;
+        document.getElementById('loading').classList.remove('active');
+      } catch (e) {
+        document.getElementById('loading').classList.remove('active');
+        const text = String(e && e.stack || e);
+        window.filmcraftLoad.error = String(e);
+        if (!params.has("webgl") && !params.has("cpu") && /wgpu|webgpu|requestDevice|requestAdapter|GPUDevice|surface/i.test(text)) {
+          params.set("webgl", "");
+          location.replace(location.pathname + "?" + params.toString().replace(/=(&|$)/g, "$1") + location.hash);
+        } else {
+          window.filmcraftFatal(e);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

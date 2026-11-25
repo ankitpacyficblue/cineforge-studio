@@ -1,0 +1,13 @@
+[package]
+name = "filmcraft-time"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+craft-time = { workspace = true }
+craft-timeline = { workspace = true }

@@ -1,33 +1,15 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-# Node dependencies
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor & OS files
-.vscode/*
-!.vscode/extensions.json
-.idea
+*~
+plan/
+/target
+/crates/*/target/
+# /dist tracked for instant Vercel WebAssembly deployment
+node_modules/
+/log
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# Uploads and temporary exports
-uploads/*
-!uploads/.gitkeep
-exports/*
-!exports/.gitkeep
-samples/*
-!samples/.gitkeep
+.claude/worktrees/
+__pycache__/
+# Checked out inside the workspace by the shared nightly workflows (craft-common-actions).
+/.nightly-tools
+/.nightly-input
+/craft-i18n
+/craft-fonts

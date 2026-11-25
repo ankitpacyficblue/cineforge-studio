@@ -1,91 +1,106 @@
-# CineForge Studio — Interactive Web Video Editing Studio
+# CineForge FilmCraft 🎬
+### Professional Non-Linear Video Editor, Color Grading & Audio Suite (Pure Rust & WebAssembly)
 
-A fast, modern, multi-track web video editing application built with React, Vite, Tailwind CSS, HTML5 Canvas compositing, and an FFmpeg production render pipeline.
-
----
-
-## 🚀 Quick Start
-
-1. Open your browser to: **[http://localhost:5173/](http://localhost:5173/)**
-2. The dev server runs both the web UI and the Node.js/FFmpeg backend concurrently:
-   ```bash
-   cd /Users/ankitmalhotra/.gemini/antigravity/scratch/video-editing-studio
-   npm run dev
-   ```
+[![Live Web Studio](https://img.shields.io/badge/Web_Studio-Vercel_Ready-6366f1?style=for-the-badge&logo=vercel)](https://vercel.com/)
+[![Built in Pure Rust](https://img.shields.io/badge/Engine-Pure_Rust-6a3fd6?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)
+[![License: MIT OR Apache-2.0](https://img.shields.io/badge/License-MIT%20%7C%20Apache--2.0-8b5cf6?style=for-the-badge)](./LICENSE-MIT)
+[![Platforms](https://img.shields.io/badge/Runs_on-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Browser-059669?style=for-the-badge)](#)
 
 ---
 
-## ✨ Studio Features
+## 🌟 Overview
 
-- **Multi-Track Timeline:**
-  - Dedicated tracks for Video, Audio/Music, and Text/Title Overlays.
-  - Interactive playhead with scrubbable time ruler (seconds + sub-second ticks).
-  - Clip trimming via left/right edge drag handles.
-  - Drag-and-drop clip repositioning with smart snapping to playhead.
-  - Track controls: Mute, Lock, Hide, and Add Track (`+ Track`).
+**CineForge FilmCraft** is an open-source, full-fledged, professional non-linear video editing (NLE) suite. It provides a complete desktop-grade editing workflow native on macOS, Windows, and Linux, and directly in the browser via WebAssembly, WebGPU, and WebCodecs.
 
-- **Real-Time Canvas Compositing Monitor:**
-  - Real-time compositing of active video, graphics, and text overlays synced to audio.
-  - Aspect ratio switcher:
-    - **16:9 Landscape** (1920×1080) for YouTube / Desktop
-    - **9:16 Vertical** (1080×1920) for Reels, Shorts & TikTok
-    - **1:1 Square** (1080×1080) for Instagram Feed
-    - **4:5 Portrait** (1080×1350) for Social Media
-
-- **Inspector & Color Grading:**
-  - **Color Grading Looks:** Normal, Vivid Pop, Film Noir, Cinematic Warm, Cyberpunk, and Vintage 70s.
-  - **Filters:** Brightness, Contrast, Saturation, and Gaussian Blur.
-  - **Transforms:** Scale/Zoom (20% – 250%), Position X/Y, Rotation (-180° – 180°), Opacity.
-  - **Text Styling:** Multi-line text, Font size, Weight, Color picker, and Background pill styling.
-  - **Audio:** Volume adjustment per clip (0% – 200%).
-
-- **Export Pipeline:**
-  - **Instant Browser Export:** Fast client-side rendering via MediaRecorder/WebCodecs into WebM/MP4.
-  - **Production FFmpeg Engine:** Leverages the local FFmpeg binary (`/opt/homebrew/bin/ffmpeg`) on the backend server for high-definition MP4 renders.
-  - Quality presets: 720p HD, 1080p Full HD, 4K UHD @ 24/30/60 FPS.
+Unlike simple web clip trimmers, FilmCraft is built from the bitstream up:
+- **Pure Rust Codecs:** Custom H.264, HEVC, ProRes, VP8, and AAC decoders and demuxers.
+- **GPU Compositor:** Color grading and compositing in linear light with sub-pixel precision.
+- **Exact Frame Timing:** Integer timecode math to guarantee zero frame drift.
+- **WebAssembly Engine:** Runs the entire desktop NLE in the browser on WebGPU (with automatic WebGL2 fallback).
+- **Client-Side Storage:** Real-time auto-saving and crash recovery via Origin Private File System (OPFS).
+- **Zero Server Costs:** Media stays local on the creator's machine.
 
 ---
 
-## ⌨️ Keyboard Shortcuts
+## 🔐 Web Studio & Authentication
 
-| Shortcut | Action |
-| :--- | :--- |
-| **`Space`** | Play / Pause playback |
-| **`S`** | Split selected clip at playhead |
-| **`D`** | Duplicate selected clip |
-| **`Delete` / `Backspace`** | Delete selected clip |
-| **`←` / `→`** | Step 1 frame backward / forward (1/30s) |
-| **`Home` / `End`** | Jump to Start / End |
-| **`Ctrl+Z` / `Cmd+Z`** | Undo |
-| **`Ctrl+Y` / `Cmd+Shift+Z`** | Redo |
+The web application includes a secure cinema-themed login gate with static credentials:
+- **Username:** `admin` (or `creator@cineforge.io`)
+- **Password:** `studio2026`
+- **1-Click Demo:** Click the **"Fill Demo"** button on the login screen to sign in instantly.
 
 ---
 
-## 📁 Project Directory Structure
+## 🚀 Instant Deployment on Vercel
+
+The repository is pre-configured with [`vercel.json`](./vercel.json) for zero-configuration deployment:
+
+1. Import this repository in [Vercel](https://vercel.com/new).
+2. Confirm the project settings:
+   - **Framework Preset:** Other / None
+   - **Output Directory:** `dist`
+   - **Build Command:** `npm run build`
+3. Click **Deploy**. Vercel will deploy the complete WebAssembly video editor with proper `.wasm` streaming headers and caching rules!
+
+---
+
+## 🖥️ Running Locally
+
+To run the WebAssembly video editor locally:
+
+```bash
+# Clone the repository
+git clone https://github.com/ankitpacyficblue/cineforge-studio.git
+cd cineforge-studio
+
+# Start the local development server (serves on http://localhost:5173)
+npx serve dist -l 5173
+```
+
+Open your browser to **http://localhost:5173/**.
+
+---
+
+## 📦 Native Desktop App (macOS, Windows, Linux)
+
+In addition to running in the browser, FilmCraft can be compiled natively using Cargo:
+
+```bash
+# Run native desktop app with GPU acceleration
+cargo run --release -p filmcraft
+```
+
+---
+
+## 📂 Architecture & Directory Structure
 
 ```
-video-editing-studio/
-├── index.html
-├── package.json
-├── vite.config.js
-├── tailwind.config.js
-├── public/
-│   └── samples/              # Pre-bundled stock video/audio clips
-├── server/
-│   └── index.js              # Express backend with FFmpeg export & upload pipeline
-└── src/
-    ├── main.jsx
-    ├── index.css
-    ├── App.jsx               # Master timeline state & keyboard shortcut listeners
-    ├── constants.js          # Aspect ratios, presets, initial track data
-    ├── utils/
-    │   └── time.js           # Timecode & duration formatting
-    └── components/
-        ├── Header.jsx        # Project branding, aspect ratio dropdown, zoom, export
-        ├── PlayerCanvas.jsx  # Real-time multi-track canvas renderer
-        ├── TransportControls.jsx # Playhead controls, timecode, speed, volume
-        ├── Timeline.jsx      # Multi-track editor with ruler, trim handles, playhead
-        ├── MediaLibrary.jsx  # Stock clips, file upload dropzone, text presets
-        ├── InspectorPanel.jsx# Properties inspector (filters, transforms, text)
-        └── ExportModal.jsx   # Browser & FFmpeg export modal with progress bar
+cineforge-studio/
+├── apps/
+│   ├── filmcraft/            # Native desktop NLE application (macOS, Windows, Linux)
+│   ├── filmcraft-cli/        # Command-line automation and render tool
+│   └── filmcraft-web/        # WebAssembly / eframe web runner
+├── crates/
+│   ├── bitstream/            # Bitstream parsers
+│   ├── color/                # Color science, LUTs, and color spaces
+│   ├── compositor/           # GPU linear-light rendering engine
+│   ├── h264enc/              # H.264 encoder
+│   ├── prores/               # Apple ProRes decoder
+│   ├── timeline/             # Multi-track integer-time sequence engine
+│   └── ui-egui/              # Professional multi-panel editing UI
+├── dist/                     # Pre-bundled WebAssembly distribution for Vercel
+│   ├── index.html            # Studio entry point with cinema login gate
+│   ├── filmcraft_web.js      # WASM JS bindings
+│   ├── filmcraft_web_bg.wasm # 50MB compiled Rust video engine
+│   └── audio-worklet.js      # WebAudio real-time mixer
+├── packaging/                # Installers for macOS (.dmg), Windows (.msi), Linux (.AppImage)
+├── xtask/                    # Build tasks and verification tooling
+└── vercel.json               # Vercel deployment configuration
 ```
+
+---
+
+## 📄 License & Credits
+
+Based on the [FilmCraft / ArtCraft](https://github.com/storytold/filmcraft) open-source project.  
+Licensed under the **MIT** or **Apache-2.0** license.
