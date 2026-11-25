@@ -6,9 +6,27 @@ import Timeline from './components/Timeline';
 import MediaLibrary from './components/MediaLibrary';
 import InspectorPanel from './components/InspectorPanel';
 import ExportModal from './components/ExportModal';
+import LoginPage from './components/LoginPage';
 import { ASPECT_RATIOS, INITIAL_TRACKS } from './constants';
 
 export default function App() {
+  // Authentication state
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cineforge_auth') || sessionStorage.getItem('cineforge_auth');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
+
+  const handleLogout = () => {
+    localStorage.removeItem('cineforge_auth');
+    sessionStorage.removeItem('cineforge_auth');
+    setCurrentUser(null);
+    setIsPlaying(false);
+  };
+
   // Project settings
   const [projectName, setProjectName] = useState('My Cinema Project');
   const [aspectRatio, setAspectRatio] = useState(ASPECT_RATIOS[0]);
@@ -76,7 +94,7 @@ export default function App() {
 
   // Playback loop using requestAnimationFrame
   useEffect(() => {
-    if (!isPlaying) {
+    if (!currentUser || !isPlaying) {
       lastTimeRef.current = null;
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       return;
@@ -106,7 +124,7 @@ export default function App() {
     return () => {
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     };
-  }, [isPlaying, playbackRate, duration, isLooping]);
+  }, [isPlaying, playbackRate, duration, isLooping, currentUser]);
 
   // Seek handler
   const handleSeek = (newTime) => {
@@ -290,8 +308,9 @@ export default function App() {
 
   // Global Keyboard Shortcuts
   useEffect(() => {
+    if (!currentUser) return;
+
     const handleKeyDown = (e) => {
-      // Don't intercept if user is typing in an input or textarea
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(e.target.tagName)) return;
 
       if (e.code === 'Space') {
@@ -330,7 +349,12 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedClip, currentTime, duration, historyIndex, history]);
+  }, [selectedClip, currentTime, duration, historyIndex, history, currentUser]);
+
+  // If unauthenticated, show the Login screen
+  if (!currentUser) {
+    return <LoginPage onLoginSuccess={setCurrentUser} />;
+  }
 
   return (
     <div
@@ -351,6 +375,8 @@ export default function App() {
         onRedo={redo}
         onOpenExport={() => setIsExportOpen(true)}
         onAddTrack={handleAddTrack}
+        currentUser={currentUser}
+        onLogout={handleLogout}
       />
 
       {/* 2. Middle Work Area: Media Library (Left) + Player Monitor (Center) + Inspector (Right) */}

@@ -9,7 +9,9 @@ import {
   Maximize2,
   Tv,
   Layers,
-  Sparkles
+  Sparkles,
+  LogOut,
+  UserCheck
 } from 'lucide-react';
 import { ASPECT_RATIOS } from '../constants';
 
@@ -25,7 +27,9 @@ export default function Header({
   onUndo,
   onRedo,
   onOpenExport,
-  onAddTrack
+  onAddTrack,
+  currentUser,
+  onLogout
 }) {
   return (
     <header className="h-14 bg-[#12151f] border-b border-[#1f2536] px-4 flex items-center justify-between z-20 shrink-0">
@@ -92,7 +96,7 @@ export default function Header({
         </div>
       </div>
 
-      {/* Right Controls: Timeline Zoom & Export */}
+      {/* Right Controls: Timeline Zoom & Export & User Session */}
       <div className="flex items-center space-x-3">
         {/* Zoom Controls */}
         <div className="flex items-center space-x-1 bg-[#181c2b] rounded-lg px-2 py-1 border border-[#242b3d]">
@@ -134,6 +138,23 @@ export default function Header({
           <Download className="w-4 h-4" />
           <span>Export Video</span>
         </button>
+
+        <div className="h-4 w-px bg-gray-700/60" />
+
+        {/* User Account & Logout */}
+        <div className="flex items-center space-x-1.5 bg-[#171b28] pl-2.5 pr-1.5 py-1 rounded-lg border border-[#252c40]">
+          <div className="flex items-center space-x-1.5 text-xs text-gray-300">
+            <UserCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="font-semibold text-gray-200 capitalize">{currentUser?.user || 'admin'}</span>
+          </div>
+          <button
+            onClick={onLogout}
+            className="p-1 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded transition"
+            title="Sign Out"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
     </header>
   );
